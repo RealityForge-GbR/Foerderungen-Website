@@ -542,8 +542,8 @@ h1 em,
 
 .project-support-copy h2 {
   font-size: clamp(2.6rem, 4vw, 3.8rem);
-  overflow-wrap: break-word;
-  hyphens: auto;
+  overflow-wrap: normal;
+  hyphens: none;
 }
 
 .project-support-copy > p:last-child {
@@ -1332,6 +1332,14 @@ h1 em,
 
   .hero {
     padding-top: 4rem;
+  }
+
+  .project-support-section {
+    padding: 2rem 1.5rem;
+  }
+
+  .project-support-copy h2 {
+    font-size: clamp(2.1rem, 10.5vw, 2.85rem);
   }
 
   h1 {
