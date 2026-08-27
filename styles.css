@@ -510,14 +510,19 @@ h1 em,
   margin: 0 auto clamp(7rem, 11vw, 11rem);
   padding: clamp(2.5rem, 6vw, 5.5rem);
   display: grid;
-  grid-template-columns: minmax(16rem, 0.72fr) minmax(28rem, 1.28fr);
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
   align-items: start;
-  gap: clamp(3rem, 8vw, 7rem);
+  gap: clamp(3rem, 6vw, 5rem);
   border: 1px solid rgba(10, 120, 255, 0.12);
   border-radius: 1.5rem 1.5rem 1.5rem 0.25rem;
   background:
     radial-gradient(circle at 3% 6%, rgba(34, 228, 229, 0.35), transparent 20rem),
     var(--cyan-soft);
+}
+
+.project-support-copy,
+.support-grid {
+  min-width: 0;
 }
 
 .project-support-section .eyebrow-light {
@@ -533,6 +538,12 @@ h1 em,
   font-weight: 500;
   line-height: 0.98;
   letter-spacing: -0.05em;
+}
+
+.project-support-copy h2 {
+  font-size: clamp(2.6rem, 4vw, 3.8rem);
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .project-support-copy > p:last-child {
