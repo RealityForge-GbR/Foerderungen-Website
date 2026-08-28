@@ -23,10 +23,11 @@
     <script>
       (() => {
         const themeColor = document.querySelector('meta[name="theme-color"]');
+        const themeStorageKey = "realityforge-theme";
         let theme = "light";
 
         try {
-          const savedTheme = localStorage.getItem("theme");
+          const savedTheme = localStorage.getItem(themeStorageKey);
           theme = savedTheme === "light" || savedTheme === "dark"
             ? savedTheme
             : window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
@@ -467,10 +468,10 @@
             <span aria-hidden="true">✓</span>
             <p><strong>Beratung auf Deutsch oder Englisch</strong>Die Zusammenarbeit ist in beiden Sprachen möglich.</p>
           </div>
-          <a class="contact-email" href="mailto:realityforge@gmail.com">realityforge@gmail.com</a>
+          <a class="contact-email" href="mailto:realityforgeeu@gmail.com">realityforgeeu@gmail.com</a>
         </div>
 
-        <form class="contact-form reveal" data-recipient="realityforge@gmail.com">
+        <form class="contact-form reveal" data-recipient="realityforgeeu@gmail.com">
           <div class="field-row">
             <label>
               <span>Name *</span>
@@ -518,6 +519,8 @@
         <a href="#ablauf">Ablauf</a>
         <a href="#ueber-uns">Über uns</a>
         <a href="#kontakt">Kontakt</a>
+        <a class="footer-legal-link" href="https://realityforge.eu/legal-notice/">Impressum</a>
+        <a class="footer-legal-link" href="https://realityforge.eu/privacy-policy/">Datenschutz</a>
       </div>
       <p class="copyright">© <span data-current-year>2026</span> RealityForge</p>
     </footer>

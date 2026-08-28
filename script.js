@@ -3,6 +3,7 @@ document.documentElement.classList.add("js");
 const themeToggle = document.querySelector(".theme-toggle");
 const themeColor = document.querySelector('meta[name="theme-color"]');
 const colorSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+const themeStorageKey = "realityforge-theme";
 
 function applyTheme(theme) {
   const isDark = theme === "dark";
@@ -23,7 +24,7 @@ themeToggle?.addEventListener("click", () => {
   applyTheme(theme);
 
   try {
-    localStorage.setItem("theme", theme);
+    localStorage.setItem(themeStorageKey, theme);
   } catch (error) {
     // Das Theme bleibt für die aktuelle Sitzung aktiv, auch wenn Speicherung blockiert ist.
   }
@@ -31,7 +32,7 @@ themeToggle?.addEventListener("click", () => {
 
 colorSchemeQuery.addEventListener?.("change", (event) => {
   try {
-    if (localStorage.getItem("theme")) return;
+    if (localStorage.getItem(themeStorageKey)) return;
   } catch (error) {
     // Ohne verfügbaren Speicher folgt die Seite weiterhin der Systemeinstellung.
   }

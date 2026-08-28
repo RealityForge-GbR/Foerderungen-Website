@@ -1646,7 +1646,7 @@ h1 em,
     grid-template-columns: 1fr auto;
   }
 
-  .footer-links {
+  .footer-links a:not(.footer-legal-link) {
     display: none;
   }
 }
