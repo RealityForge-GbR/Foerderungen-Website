@@ -11,8 +11,8 @@ function applyTheme(theme) {
   themeColor?.setAttribute("content", isDark ? "#090d14" : "#f8f6f2");
 
   if (themeToggle) {
-    themeToggle.setAttribute("aria-pressed", String(isDark));
-    themeToggle.setAttribute("aria-label", isDark ? "Hellen Modus aktivieren" : "Dunklen Modus aktivieren");
+    themeToggle.setAttribute("aria-pressed", String(!isDark));
+    themeToggle.setAttribute("aria-label", isDark ? "Light Mode aktivieren" : "Dark Mode aktivieren");
   }
 }
 
