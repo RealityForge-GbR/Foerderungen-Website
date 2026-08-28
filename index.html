@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="RealityForge unterstützt technologieorientierte Unternehmen in Berlin und Brandenburg bei Förderfähigkeit, Antragstellung und der Betreuung laufender Förderprojekte.">
-    <meta name="theme-color" content="#05070e">
+    <meta name="theme-color" content="#f8f6f2">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="de_DE">
     <meta property="og:title" content="Fördermittel. Mit Gründerblick.">
@@ -20,6 +20,25 @@
     <meta name="twitter:image" content="https://foerderungen.realityforge.eu/public/og.png">
     <link rel="canonical" href="https://foerderungen.realityforge.eu/">
     <title>RealityForge Fördermittelberatung · Berlin & Brandenburg</title>
+    <script>
+      (() => {
+        const themeColor = document.querySelector('meta[name="theme-color"]');
+        let theme = "light";
+
+        try {
+          const savedTheme = localStorage.getItem("theme");
+          theme = savedTheme === "light" || savedTheme === "dark"
+            ? savedTheme
+            : window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        } catch (error) {
+          theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+        themeColor.setAttribute("content", theme === "dark" ? "#090d14" : "#f8f6f2");
+      })();
+    </script>
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
   </head>
@@ -36,7 +55,18 @@
         <a href="#projektbetreuung">Projektbetreuung</a>
         <a href="#erfahrung">Erfahrung</a>
       </nav>
-      <a class="header-cta" href="#kontakt">Fördercheck anfragen</a>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Dunklen Modus aktivieren" aria-pressed="false">
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.2 15.2A8.5 8.5 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z"></path>
+          </svg>
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="3.5"></circle>
+            <path d="M12 2.2v2.1M12 19.7v2.1M21.8 12h-2.1M4.3 12H2.2M18.9 5.1l-1.5 1.5M6.6 17.4l-1.5 1.5M18.9 18.9l-1.5-1.5M6.6 6.6 5.1 5.1"></path>
+          </svg>
+        </button>
+        <a class="header-cta" href="#kontakt">Fördercheck anfragen</a>
+      </div>
     </header>
 
     <main id="main-content">
@@ -100,7 +130,9 @@
 
       <section class="service-grid" aria-label="Unsere Leistungen">
         <article class="service-card reveal">
-          <span class="service-number">01</span>
+          <span class="service-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="5.5"></circle><path d="m14.5 14.5 4.3 4.3M8.2 10.6l1.5 1.5 3.2-3.4"></path></svg>
+          </span>
           <h3>Förderfähigkeit</h3>
           <p>Wir prüfen Idee, Entwicklungsrisiko, Kosten, Team und Timing und priorisieren passende Förderwege.</p>
           <ul>
@@ -110,7 +142,9 @@
           </ul>
         </article>
         <article class="service-card service-card-accent reveal">
-          <span class="service-number">02</span>
+          <span class="service-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M7 3.5h7l4 4V20H7zM14 3.5V8h4M10 12h5M10 15.5h5"></path><path d="m4.5 8.5-1 1 1 1"></path></svg>
+          </span>
           <h3>Projekt & Antrag</h3>
           <p>Wir entwickeln aus der technischen Idee ein prüfbares Vorhaben mit klarer Forschungs- und Entwicklungslogik.</p>
           <ul>
@@ -120,7 +154,9 @@
           </ul>
         </article>
         <article class="service-card reveal">
-          <span class="service-number">03</span>
+          <span class="service-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="6" height="5" rx="1"></rect><rect x="15" y="15" width="6" height="5" rx="1"></rect><path d="M9 6.5h3a4 4 0 0 1 4 4v1M15 17.5h-3a4 4 0 0 1-4-4v-1M14 10l2 2 2-2M10 14l-2-2-2 2"></path></svg>
+          </span>
           <h3>Verfahren</h3>
           <p>Wir strukturieren die Einreichung und helfen, fachliche oder formale Rückfragen der Projektträger richtig zu verstehen.</p>
           <ul>
@@ -145,22 +181,30 @@
         </div>
         <div class="support-grid reveal">
           <article>
-            <span>01</span>
+            <span class="support-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"></circle><path d="M15.5 8.5c-.8-.7-1.8-1-3-1-2 0-3.5 1.1-3.5 2.6s1.4 2.1 3.4 2.4 3.6.9 3.6 2.5-1.6 2.6-3.7 2.6c-1.4 0-2.7-.5-3.6-1.3M12.4 5.5v13"></path></svg>
+            </span>
             <h3>Mittelabrufe & Abrechnung</h3>
             <p>Kosten den Projekten und Arbeitspaketen zuordnen, Nachweistabellen führen und einschätzen, was abgerechnet werden darf.</p>
           </article>
           <article>
-            <span>02</span>
+            <span class="support-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"></circle><circle cx="17" cy="9" r="2.3"></circle><path d="M3.5 19c.4-3.3 2.4-5 5.5-5s5.1 1.7 5.5 5M14.5 14.5c.8-.5 1.7-.7 2.7-.7 2.3 0 3.8 1.3 4.1 3.8"></path></svg>
+            </span>
             <h3>Personal & Tätigkeiten</h3>
             <p>Personalfragebögen, Änderungen im Projektteam, Stundenzettel und Tätigkeitsnachweise förderkonform vorbereiten.</p>
           </article>
           <article>
-            <span>03</span>
+            <span class="support-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M6 21V4M6 5h10l-1.7 3L16 11H6"></path><path d="M10 17v-3M14 17v-5M18 17V9M8 19h12"></path></svg>
+            </span>
             <h3>Meilensteine & Berichte</h3>
             <p>Meilensteinplanung und Präsentationen sowie Zwischenberichte und Projektberichte strukturiert erarbeiten.</p>
           </article>
           <article>
-            <span>04</span>
+            <span class="support-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3 19 6v5.2c0 4.4-2.7 7.7-7 9.8-4.3-2.1-7-5.4-7-9.8V6z"></path><path d="m8.5 12 2.2 2.2 4.8-5"></path></svg>
+            </span>
             <h3>Prüfungen & Abschluss</h3>
             <p>Rückfragen mit Projektträgern klären, Stichprobenprüfungen begleiten sowie Verwendungsnachweise und Schlussabrechnungen vorbereiten.</p>
           </article>

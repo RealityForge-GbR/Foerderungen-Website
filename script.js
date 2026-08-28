@@ -1,5 +1,44 @@
 document.documentElement.classList.add("js");
 
+const themeToggle = document.querySelector(".theme-toggle");
+const themeColor = document.querySelector('meta[name="theme-color"]');
+const colorSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+function applyTheme(theme) {
+  const isDark = theme === "dark";
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.style.colorScheme = theme;
+  themeColor?.setAttribute("content", isDark ? "#090d14" : "#f8f6f2");
+
+  if (themeToggle) {
+    themeToggle.setAttribute("aria-pressed", String(isDark));
+    themeToggle.setAttribute("aria-label", isDark ? "Hellen Modus aktivieren" : "Dunklen Modus aktivieren");
+  }
+}
+
+applyTheme(document.documentElement.dataset.theme || "light");
+
+themeToggle?.addEventListener("click", () => {
+  const theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  applyTheme(theme);
+
+  try {
+    localStorage.setItem("theme", theme);
+  } catch (error) {
+    // Das Theme bleibt für die aktuelle Sitzung aktiv, auch wenn Speicherung blockiert ist.
+  }
+});
+
+colorSchemeQuery.addEventListener?.("change", (event) => {
+  try {
+    if (localStorage.getItem("theme")) return;
+  } catch (error) {
+    // Ohne verfügbaren Speicher folgt die Seite weiterhin der Systemeinstellung.
+  }
+
+  applyTheme(event.matches ? "dark" : "light");
+});
+
 const form = document.querySelector(".contact-form");
 
 if (form) {
