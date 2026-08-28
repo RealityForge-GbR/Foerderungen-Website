@@ -1,5 +1,7 @@
 document.documentElement.classList.add("js");
 
+const pageLanguage = document.documentElement.lang.toLowerCase();
+const isEnglish = pageLanguage.startsWith("en");
 const themeToggle = document.querySelector(".theme-toggle");
 const themeColor = document.querySelector('meta[name="theme-color"]');
 const colorSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -12,8 +14,13 @@ function applyTheme(theme) {
   themeColor?.setAttribute("content", isDark ? "#090d14" : "#f8f6f2");
 
   if (themeToggle) {
-    themeToggle.setAttribute("aria-pressed", String(!isDark));
-    themeToggle.setAttribute("aria-label", isDark ? "Light Mode aktivieren" : "Dark Mode aktivieren");
+    themeToggle.setAttribute("aria-pressed", String(isDark));
+    themeToggle.setAttribute(
+      "aria-label",
+      isEnglish
+        ? isDark ? "Switch to light mode" : "Switch to dark mode"
+        : isDark ? "Light Mode aktivieren" : "Dark Mode aktivieren",
+    );
   }
 }
 
@@ -40,6 +47,17 @@ colorSchemeQuery.addEventListener?.("change", (event) => {
   applyTheme(event.matches ? "dark" : "light");
 });
 
+const languageLinks = document.querySelectorAll("[data-language-link]");
+
+function syncLanguageLinks() {
+  languageLinks.forEach((link) => {
+    link.setAttribute("href", `${link.dataset.languagePath}${window.location.hash}`);
+  });
+}
+
+syncLanguageLinks();
+window.addEventListener("hashchange", syncLanguageLinks);
+
 const form = document.querySelector(".contact-form");
 
 if (form) {
@@ -51,23 +69,38 @@ if (form) {
     const data = new FormData(form);
     const recipient = form.dataset.recipient;
     const name = data.get("name");
-    const startup = data.get("startup") || "Nicht angegeben";
-    const phase = data.get("phase") || "Nicht angegeben";
+    const notProvided = isEnglish ? "Not provided" : "Nicht angegeben";
+    const startup = data.get("startup") || notProvided;
+    const phase = data.get("phase") || notProvided;
     const email = data.get("email");
     const message = data.get("message");
-    const subject = `Fördercheck-Anfrage von ${name}${startup !== "Nicht angegeben" ? ` · ${startup}` : ""}`;
-    const body = [
-      `Name: ${name}`,
-      `E-Mail: ${email}`,
-      `Startup / Projekt: ${startup}`,
-      `Phase: ${phase}`,
-      "",
-      "Vorhaben:",
-      message,
-    ].join("\n");
+    const subject = isEnglish
+      ? `Funding check enquiry from ${name}${startup !== notProvided ? ` · ${startup}` : ""}`
+      : `Fördercheck-Anfrage von ${name}${startup !== notProvided ? ` · ${startup}` : ""}`;
+    const body = (isEnglish
+      ? [
+          `Name: ${name}`,
+          `Email: ${email}`,
+          `Company / project: ${startup}`,
+          `Phase: ${phase}`,
+          "",
+          "Project:",
+          message,
+        ]
+      : [
+          `Name: ${name}`,
+          `E-Mail: ${email}`,
+          `Startup / Projekt: ${startup}`,
+          `Phase: ${phase}`,
+          "",
+          "Vorhaben:",
+          message,
+        ]).join("\n");
 
     const status = form.querySelector(".form-status");
-    status.textContent = "Euer E-Mail-Programm wird geöffnet …";
+    status.textContent = isEnglish
+      ? "Your email application is opening …"
+      : "Euer E-Mail-Programm wird geöffnet …";
     window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   });
 }

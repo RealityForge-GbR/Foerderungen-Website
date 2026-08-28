@@ -75,7 +75,7 @@ html {
 }
 
 body {
-  min-width: 20rem;
+  min-width: 0;
   margin: 0;
   overflow-x: hidden;
   background:
@@ -211,6 +211,42 @@ textarea {
   align-items: center;
   justify-self: end;
   gap: 0.75rem;
+}
+
+.language-switch {
+  min-height: 2.85rem;
+  display: inline-grid;
+  grid-template-columns: repeat(2, 1.95rem);
+  align-items: center;
+  padding: 0.22rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.65rem;
+  background: transparent;
+}
+
+.language-option {
+  min-width: 0;
+  min-height: 2.3rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.42rem;
+  color: var(--ink-soft);
+  font-size: 0.67rem;
+  font-weight: 820;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-decoration: none;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.language-option[aria-current="page"] {
+  background: var(--paper-light);
+  color: var(--ink);
+}
+
+a.language-option:hover {
+  background: var(--accent-hover);
+  color: var(--blue-dark);
 }
 
 .theme-toggle {
@@ -1533,6 +1569,12 @@ h1 em,
   }
 }
 
+@media (min-width: 64.01rem) {
+  :root[lang="en"] h1 {
+    font-size: clamp(3.8rem, 8.2vw, 6.4rem);
+  }
+}
+
 @media (max-width: 64rem) {
   .site-header {
     grid-template-columns: 1fr auto;
@@ -1688,13 +1730,35 @@ h1 em,
     gap: 0.45rem;
   }
 
+  .language-switch {
+    min-height: 2.5rem;
+    grid-template-columns: repeat(2, 1.55rem);
+    padding: 0.18rem;
+  }
+
+  .language-option {
+    min-height: 2.12rem;
+    font-size: 0.61rem;
+  }
+
+  .theme-toggle {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
   .header-cta {
-    padding-inline: 0.85rem;
-    font-size: 0.75rem;
+    min-height: 2.5rem;
+    padding-inline: 0.7rem;
+    font-size: 0.69rem;
+    white-space: nowrap;
   }
 
   .brand > span:last-child {
     display: none;
+  }
+
+  .brand-mark {
+    width: 2.25rem;
   }
 
   .hero {
@@ -1767,6 +1831,12 @@ h1 em,
   .site-footer {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+  }
+}
+
+@media (max-width: 22rem) {
+  .header-cta {
+    display: none;
   }
 }
 
