@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Förderhilfe von Gründern für Gründer. Förderstrategie, Antrag und Begleitung mit RealityForge.">
+    <meta name="theme-color" content="#f8f6f2">
+    <meta property="og:type" content="profile">
+    <meta property="og:locale" content="de_DE">
+    <meta property="og:title" content="Patrick Bethke | RealityForge Förderungen">
+    <meta property="og:description" content="Förderhilfe von Gründern für Gründer. Förderstrategie, Antrag und Begleitung mit RealityForge.">
+    <meta property="og:url" content="https://foerderungen.realityforge.eu/patrick/">
+    <meta property="og:image" content="https://foerderungen.realityforge.eu/assets/patrick.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="384">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:alt" content="Porträt von Patrick Bethke">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Patrick Bethke | RealityForge Förderungen">
+    <meta name="twitter:description" content="Förderhilfe von Gründern für Gründer. Förderstrategie, Antrag und Begleitung mit RealityForge.">
+    <meta name="twitter:image" content="https://foerderungen.realityforge.eu/assets/patrick.png">
+    <meta name="twitter:image:alt" content="Porträt von Patrick Bethke">
+    <link rel="canonical" href="https://foerderungen.realityforge.eu/patrick/">
+    <title>Patrick Bethke | RealityForge Förderungen</title>
+    <script>
+      (() => {
+        const themeColor = document.querySelector('meta[name="theme-color"]');
+        const themeStorageKey = "realityforge-theme";
+        let theme = "light";
+
+        try {
+          const savedTheme = localStorage.getItem(themeStorageKey);
+          theme = savedTheme === "light" || savedTheme === "dark"
+            ? savedTheme
+            : window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        } catch (error) {
+          theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+        themeColor.setAttribute("content", theme === "dark" ? "#090d14" : "#f8f6f2");
+      })();
+    </script>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/evgeni/card.css">
+    <script src="/script.js" defer></script>
+  </head>
+  <body class="business-card-page">
+    <a class="skip-link" href="#contact-card">Zur Visitenkarte springen</a>
+
+    <header class="site-header card-page-header">
+      <a class="brand" href="/" aria-label="RealityForge Fördermittelberatung – Startseite">
+        <span class="brand-mark" aria-hidden="true">RF</span>
+        <span>RealityForge <strong>Förderungen</strong></span>
+      </a>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Light Mode aktivieren" aria-pressed="false">
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="3.5"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path>
+          </svg>
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.2 15.1A8.5 8.5 0 0 1 8.9 3.8 8.5 8.5 0 1 0 20.2 15.1Z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="card-page-main">
+      <article class="digital-card" id="contact-card" aria-labelledby="card-name">
+        <div class="profile-photo">
+          <img src="/assets/patrick.png" width="384" height="512" alt="Porträt von Patrick Bethke" decoding="async" fetchpriority="high">
+        </div>
+
+        <header class="profile-heading">
+          <h1 id="card-name">Patrick Bethke</h1>
+          <p>Co-Founder <span aria-hidden="true">|</span> RealityForge GbR</p>
+        </header>
+
+        <div class="card-message">
+          <h2>Förderhilfe.<br><em>Von Gründern für Gründer.</em></h2>
+          <p aria-label="Förderstrategie, Antrag und Begleitung">
+            <span aria-hidden="true">Förderstrategie</span>
+            <span aria-hidden="true">Antrag</span>
+            <span aria-hidden="true">Begleitung</span>
+          </p>
+        </div>
+
+        <nav class="contact-actions" aria-label="Kontaktmöglichkeiten">
+          <a class="button button-primary contact-action contact-action-primary" href="/patrick.vcf">
+            <svg class="card-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 19.5v-1.2c0-2.5-1.8-4.3-4.5-4.3S6 15.8 6 18.3v1.2"></path>
+              <circle cx="10.5" cy="8" r="3"></circle>
+              <path d="M18 8v6M15 11h6"></path>
+            </svg>
+            <span>Kontakt speichern</span>
+          </a>
+          <a class="button contact-action" href="mailto:realityforgeeu@gmail.com" aria-label="E-Mail an Patrick Bethke schreiben">
+            <svg class="card-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+              <path d="m4 7 8 6 8-6"></path>
+            </svg>
+            <span>E-Mail</span>
+          </a>
+          <a class="button contact-action" href="tel:+491771985593" aria-label="Patrick Bethke anrufen">
+            <svg class="card-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7.2 3.5 10 7.8 7.9 10c1.3 2.6 3.5 4.8 6.1 6.1l2.2-2.1 4.3 2.8-.8 3.2c-.2.7-.8 1.2-1.5 1.2C9.7 21.2 2.8 14.3 2.8 5.8c0-.7.5-1.3 1.2-1.5z"></path>
+            </svg>
+            <span>Anrufen</span>
+          </a>
+          <a class="button contact-action contact-action-site" href="https://foerderungen.realityforge.eu/">
+            <svg class="card-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 18V9l8-5 8 5v9"></path>
+              <path d="M8 18v-6h8v6M3 20h18"></path>
+            </svg>
+            <span>Förderungen</span>
+          </a>
+        </nav>
+      </article>
+    </main>
+  </body>
+</html>
