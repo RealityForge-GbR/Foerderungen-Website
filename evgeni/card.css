@@ -1,0 +1,232 @@
+.business-card-page {
+  min-height: 100vh;
+  min-height: 100svh;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(34, 228, 229, 0.17), transparent 22rem),
+    var(--paper);
+}
+
+.card-page-header {
+  width: min(100% - 2rem, 42rem);
+  display: flex;
+  grid-template-columns: none;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.card-page-header .header-actions {
+  margin-left: auto;
+}
+
+.card-page-header .theme-toggle {
+  width: 2.85rem;
+  height: 2.85rem;
+}
+
+.card-page-main {
+  width: min(100%, 42rem);
+  min-height: calc(100vh - 5.75rem);
+  min-height: calc(100svh - 5.75rem);
+  margin-inline: auto;
+  padding: clamp(1rem, 4vw, 2.5rem) 1rem clamp(1.5rem, 5vw, 3rem);
+  display: grid;
+  place-items: center;
+}
+
+.digital-card {
+  position: relative;
+  width: min(100%, 34rem);
+  overflow: hidden;
+  padding: clamp(1.35rem, 5vw, 2.25rem);
+  border: 1px solid var(--line);
+  border-radius: 1.5rem 1.5rem 1.5rem 0.25rem;
+  background:
+    radial-gradient(circle at 92% 6%, rgba(10, 120, 255, 0.12), transparent 13rem),
+    var(--paper-light);
+  box-shadow: 0 1.5rem 4rem rgba(0, 7, 17, 0.12);
+  text-align: center;
+}
+
+:root[data-theme="dark"] .digital-card {
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.32);
+}
+
+.profile-photo {
+  width: clamp(6.75rem, 29vw, 7.75rem);
+  aspect-ratio: 3 / 4;
+  margin-inline: auto;
+  overflow: hidden;
+  border: 1px solid rgba(34, 228, 229, 0.48);
+  border-radius: 1.15rem 1.15rem 1.15rem 0.25rem;
+  background: var(--dark-section-deep);
+  box-shadow: 0 0.9rem 2.4rem rgba(0, 7, 17, 0.18);
+}
+
+.profile-photo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.profile-heading {
+  margin-top: 1rem;
+}
+
+.profile-heading h1 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.15rem, 9vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.profile-heading p {
+  margin: 0.55rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  font-weight: 720;
+  letter-spacing: 0.015em;
+}
+
+.card-message {
+  margin-top: 1.35rem;
+  padding-top: 1.35rem;
+  border-top: 1px solid var(--line);
+}
+
+.card-message h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.85rem, 7.8vw, 2.4rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.card-message h2 em {
+  color: var(--blue);
+  font-weight: 500;
+}
+
+.card-message p {
+  margin: 0.85rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.2rem 0.45rem;
+  color: var(--ink-soft);
+  font-size: clamp(0.72rem, 3.1vw, 0.83rem);
+  font-weight: 780;
+  letter-spacing: 0.035em;
+}
+
+.card-message p span {
+  white-space: nowrap;
+}
+
+.card-message p span + span::before {
+  content: "·";
+  margin-right: 0.45rem;
+  color: var(--blue-dark);
+}
+
+.contact-actions {
+  margin-top: 1.35rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.contact-action {
+  min-width: 0;
+  min-height: 3.6rem;
+  padding: 0.8rem 1rem;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.85rem;
+  background: var(--field-surface);
+  color: var(--ink);
+  font-size: 0.84rem;
+  text-align: left;
+}
+
+.contact-action:hover {
+  border-color: var(--blue);
+  background: var(--accent-hover);
+}
+
+.contact-action-primary,
+.contact-action-site {
+  grid-column: 1 / -1;
+}
+
+.contact-action-primary {
+  border-color: transparent;
+  background: var(--cyan);
+  color: var(--contrast-ink);
+}
+
+.contact-action-primary:hover {
+  border-color: transparent;
+  background: #5ff4f1;
+}
+
+.contact-action-site {
+  border-color: rgba(34, 228, 229, 0.28);
+  background: var(--dark-section-deep);
+  color: var(--on-dark);
+}
+
+.contact-action-site:hover {
+  border-color: rgba(34, 228, 229, 0.55);
+  background: #071722;
+}
+
+.card-action-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.contact-action:not(.contact-action-primary, .contact-action-site) .card-action-icon {
+  color: var(--blue-dark);
+}
+
+.back-link {
+  margin-top: 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+  font-weight: 720;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 0.25rem;
+}
+
+.back-link:hover {
+  color: var(--blue-dark);
+}
+
+@media (max-width: 36rem) {
+  .card-page-header {
+    min-height: 5rem;
+  }
+
+  .card-page-main {
+    min-height: calc(100vh - 5rem);
+    min-height: calc(100svh - 5rem);
+  }
+
+  .digital-card {
+    padding: 1.25rem;
+  }
+}
