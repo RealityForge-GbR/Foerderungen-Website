@@ -40,20 +40,33 @@ export function confirmationMail(address, language) {
   const english = language === "en";
   // Fixed text only: never echo user-controlled names, messages or links to visitors.
   const paragraphs = english ? [
-    "Hello,",
-    "Thank you for your interest in RealityForge funding support!",
-    "We have received your enquiry. We will take a look at your project and usually get back to you within 48 hours.",
-    "If you would like to add anything, simply reply to this email.",
-    "Best wishes,\nPatrick & Evgeni\nRealityForge GbR\nhttps://foerderungen.realityforge.eu/",
-    "This is an automatic acknowledgement. If you did not submit an enquiry, you can ignore this email.",
-  ] : [
-    "Hallo,",
-    "vielen Dank für dein Interesse an RealityForge Förderungen!",
-    "Deine Anfrage ist bei uns angekommen. Wir schauen uns dein Vorhaben an und melden uns in der Regel innerhalb von 48 Stunden bei dir.",
-    "Falls du noch etwas ergänzen möchtest, antworte einfach auf diese E-Mail.",
-    "Viele Grüße\nPatrick & Evgeni\nRealityForge GbR\nhttps://foerderungen.realityforge.eu/",
-    "Dies ist eine automatische Eingangsbestätigung. Falls du keine Anfrage gestellt hast, kannst du diese E-Mail ignorieren.",
-  ];
+  "Hello,",
+
+  "Thank you for your enquiry to RealityForge.",
+
+  "We have received your funding enquiry. We will review your project and potential funding options and usually get back to you personally within 48 hours.",
+
+  "If you would like to send us any additional information or documents in the meantime, simply reply to this email.",
+
+  "Best wishes,\nPatrick & Evgeni\nRealityForge GbR\nFunding consulting for technology companies and founding teams\nhttps://foerderungen.realityforge.eu/",
+
+  "This is an automatic acknowledgement. If you did not submit an enquiry, you can ignore this email.",
+
+] : [
+
+  "Hallo,",
+
+  "vielen Dank für deine Anfrage bei RealityForge.",
+
+  "Deine Förderanfrage ist bei uns angekommen. Wir schauen uns dein Vorhaben und mögliche Förderwege an und melden uns in der Regel innerhalb von 48 Stunden persönlich bei dir.",
+
+  "Falls du uns vorab noch weitere Informationen oder Unterlagen schicken möchtest, kannst du einfach auf diese E-Mail antworten.",
+
+  "Viele Grüße\nPatrick & Evgeni\nRealityForge GbR\nFördermittelberatung für Technologieunternehmen und Gründungsteams\nhttps://foerderungen.realityforge.eu/",
+
+  "Dies ist eine automatische Eingangsbestätigung. Falls du keine Anfrage gestellt hast, kannst du diese E-Mail ignorieren.",
+
+];
   return {
     from: { email: SENDER, name: "RealityForge Förderungen" },
     to: address,
