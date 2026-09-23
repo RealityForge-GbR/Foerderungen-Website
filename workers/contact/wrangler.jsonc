@@ -1,0 +1,26 @@
+{
+  "name": "realityforge-foerderungen-contact",
+  "main": "index.mjs",
+  "compatibility_date": "2026-09-23",
+  "account_id": "301b9e2cebe3502a8ea4e421b5df690b",
+  "workers_dev": true,
+  "preview_urls": false,
+  "send_email": [{
+    "name": "EMAIL",
+    "destination_address": "realityforgeeu@gmail.com",
+    "allowed_sender_addresses": ["foerdercheck@kontakt.realityforge.eu"]
+  }],
+  "ratelimits": [
+    {
+      "name": "CONTACT_RATE_LIMITER",
+      "namespace_id": "2026092301",
+      "simple": { "limit": 3, "period": 60 }
+    },
+    {
+      "name": "CONTACT_GLOBAL_LIMITER",
+      "namespace_id": "2026092302",
+      "simple": { "limit": 30, "period": 60 }
+    }
+  ],
+  "observability": { "enabled": false }
+}

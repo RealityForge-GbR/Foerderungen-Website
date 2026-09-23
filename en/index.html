@@ -43,8 +43,8 @@
         themeColor.setAttribute("content", theme === "dark" ? "#090d14" : "#f8f6f2");
       })();
     </script>
-    <link rel="stylesheet" href="/styles.css">
-    <script src="/script.js" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=contact-20260923">
+    <script src="/script.js?v=contact-20260923" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -457,20 +457,20 @@
           <a class="contact-email" href="mailto:realityforgeeu@gmail.com">realityforgeeu@gmail.com</a>
         </div>
 
-        <form class="contact-form reveal" data-recipient="realityforgeeu@gmail.com">
+        <form class="contact-form reveal" action="https://realityforge-foerderungen-contact.realityforgeeu.workers.dev/" method="post" aria-describedby="contact-privacy">
           <div class="field-row">
             <label>
               <span>Name *</span>
-              <input type="text" name="name" autocomplete="name" required>
+              <input type="text" name="name" autocomplete="name" maxlength="120" required>
             </label>
             <label>
               <span>Email *</span>
-              <input type="email" name="email" autocomplete="email" required>
+              <input type="email" name="email" autocomplete="email" maxlength="254" required>
             </label>
           </div>
           <label>
             <span>Company / project</span>
-            <input type="text" name="startup" autocomplete="organization">
+            <input type="text" name="startup" autocomplete="organization" maxlength="200">
           </label>
           <label>
             <span>What stage are you at?</span>
@@ -485,11 +485,15 @@
           </label>
           <label>
             <span>What is your project about? *</span>
-            <textarea name="message" rows="5" required placeholder="A few sentences about your idea, team, location and funding needs, or about your current project …"></textarea>
+            <textarea name="message" rows="5" maxlength="5000" required placeholder="A few sentences about your idea, team, location and funding needs, or about your current project …"></textarea>
           </label>
-          <button class="button button-primary button-submit" type="submit">Request a funding check <span aria-hidden="true">→</span></button>
-          <p class="form-note">Submitting the form opens your email application. No form data is stored on this website.</p>
-          <p class="form-status" role="status" aria-live="polite"></p>
+          <div class="form-honeypot" aria-hidden="true" inert>
+            <label>Website (leave blank)<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+          </div>
+          <button class="button button-primary button-submit" type="submit" disabled><span class="submit-label">Request a funding check</span> <span aria-hidden="true">→</span></button>
+          <p class="form-note" id="contact-privacy">Your details are sent to us by email via Cloudflare and used to handle your enquiry. <a href="https://realityforge.eu/privacy-policy/">Privacy policy</a></p>
+          <noscript><p class="form-note">The form requires JavaScript. Alternatively, email <a href="mailto:realityforgeeu@gmail.com">realityforgeeu@gmail.com</a>.</p></noscript>
+          <p class="form-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p>
         </form>
       </section>
     </main>

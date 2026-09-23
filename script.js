@@ -61,48 +61,88 @@ window.addEventListener("hashchange", syncLanguageLinks);
 const form = document.querySelector(".contact-form");
 
 if (form) {
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
+  const submitButton = form.querySelector('[type="submit"]');
+  const submitLabel = submitButton.querySelector(".submit-label") || submitButton;
+  const idleLabel = submitLabel.textContent;
+  const status = form.querySelector(".form-status");
+  // Also tolerate an older cached HTML page loading the updated shared script.
+  const endpoint = form.getAttribute("action") || "https://realityforge-foerderungen-contact.realityforgeeu.workers.dev/";
+  const copy = isEnglish ? {
+    sending: "Sending …",
+    success: "Your enquiry has been submitted. We will get back to you by email.",
+    invalid: "Please check your entries. Name, a valid email address and a message are required.",
+    limited: "Too many attempts. Please wait a minute before trying again. Your entries have been kept.",
+    error: "Sending could not be confirmed. Your entries have been kept. Please try again later or email us directly at realityforgeeu@gmail.com.",
+    required: "Please fill in this field.",
+  } : {
+    sending: "Wird gesendet …",
+    success: "Eure Anfrage wurde übermittelt. Wir melden uns per E-Mail bei euch.",
+    invalid: "Bitte prüft eure Angaben. Name, eine gültige E-Mail-Adresse und eine Nachricht sind erforderlich.",
+    limited: "Zu viele Versuche. Bitte wartet eine Minute und versucht es erneut. Eure Eingaben bleiben erhalten.",
+    error: "Der Versand konnte nicht bestätigt werden. Eure Eingaben bleiben erhalten. Bitte versucht es später erneut oder schreibt direkt an realityforgeeu@gmail.com.",
+    required: "Bitte füllt dieses Feld aus.",
+  };
+  let sending = false;
 
+  form.querySelectorAll("[required]").forEach((input) => {
+    input.addEventListener("input", () => input.setCustomValidity(""));
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (sending) return;
+    form.querySelectorAll("[required]").forEach((input) => {
+      input.setCustomValidity(input.value.trim() ? "" : copy.required);
+    });
     if (!form.reportValidity()) return;
 
     const data = new FormData(form);
-    const recipient = form.dataset.recipient;
-    const name = data.get("name");
-    const notProvided = isEnglish ? "Not provided" : "Nicht angegeben";
-    const startup = data.get("startup") || notProvided;
-    const phase = data.get("phase") || notProvided;
-    const email = data.get("email");
-    const message = data.get("message");
-    const subject = isEnglish
-      ? `Funding check enquiry from ${name}${startup !== notProvided ? ` · ${startup}` : ""}`
-      : `Fördercheck-Anfrage von ${name}${startup !== notProvided ? ` · ${startup}` : ""}`;
-    const body = (isEnglish
-      ? [
-          `Name: ${name}`,
-          `Email: ${email}`,
-          `Company / project: ${startup}`,
-          `Phase: ${phase}`,
-          "",
-          "Project:",
-          message,
-        ]
-      : [
-          `Name: ${name}`,
-          `E-Mail: ${email}`,
-          `Startup / Projekt: ${startup}`,
-          `Phase: ${phase}`,
-          "",
-          "Vorhaben:",
-          message,
-        ]).join("\n");
+    const payload = { language: isEnglish ? "en" : "de" };
+    ["name", "email", "startup", "phase", "message", "website"].forEach((key) => {
+      payload[key] = String(data.get(key) || "").trim();
+    });
+    sending = true;
+    submitButton.disabled = true;
+    submitLabel.textContent = copy.sending;
+    form.setAttribute("aria-busy", "true");
+    status.textContent = copy.sending;
+    status.dataset.state = "pending";
 
-    const status = form.querySelector(".form-status");
-    status.textContent = isEnglish
-      ? "Your email application is opening …"
-      : "Euer E-Mail-Programm wird geöffnet …";
-    window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 25000);
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        credentials: "omit",
+        referrerPolicy: "no-referrer",
+        signal: controller.signal,
+      });
+      const result = await response.json();
+      if (!response.ok || result.ok !== true) {
+        status.textContent = response.status === 429 ? copy.limited
+          : response.status === 400 || response.status === 413 ? copy.invalid : copy.error;
+        status.dataset.state = "error";
+      } else {
+        form.reset();
+        status.textContent = copy.success;
+        status.dataset.state = "success";
+      }
+    } catch {
+      status.textContent = copy.error;
+      status.dataset.state = "error";
+    } finally {
+      clearTimeout(timeout);
+      sending = false;
+      form.removeAttribute("aria-busy");
+      submitButton.disabled = false;
+      submitLabel.textContent = idleLabel;
+      status.focus({ preventScroll: true });
+    }
   });
+  // Without JavaScript the disabled button prevents form data ending up in a URL.
+  submitButton.disabled = false;
 }
 
 document.querySelectorAll("[data-current-year]").forEach((element) => {
