@@ -1,3 +1,5 @@
+import { parseEmail, checkMailDomain } from "./email-validation.mjs";
+
 const ALLOWED_ORIGIN = "https://foerderungen.realityforge.eu";
 const RECIPIENT = "realityforgeeu@gmail.com";
 const SENDER = "foerdercheck@kontakt.realityforge.eu";
@@ -103,18 +105,22 @@ export default {
       const startup = field(data.startup, 200);
       const phase = field(data.phase, 120);
       const message = field(data.message, 5000, true, true);
-      if ([name, email, startup, phase, message].includes(null) ||
-          !/^[^\s<>@,;]+@[^\s<>@,;]+\.[^\s<>@,;]+$/.test(email)) {
+      if ([name, startup, phase, message].includes(null)) {
         return reply(400, "invalid");
       }
+      const mailbox = parseEmail(email);
+      if (!mailbox) return reply(400, "email_format");
       const globalLimit = await env.CONTACT_GLOBAL_LIMITER.limit({ key: "contact" });
       if (!globalLimit.success) return reply(429, "rate_limit");
+      const mailDomain = await checkMailDomain(mailbox.domain);
+      if (mailDomain === "invalid") return reply(400, "email_domain");
+      if (mailDomain === "unavailable") return reply(503, "email_check_unavailable");
 
       // Fixed envelope, plain text only. Visitors can never choose a recipient.
       await env.EMAIL.send({
         from: { email: SENDER, name: "RealityForge Fördercheck" },
         to: RECIPIENT,
-        replyTo: email,
+        replyTo: mailbox.address,
         subject: `Fördercheck-Anfrage von ${name}`,
         text: [
           "Neue Anfrage über foerderungen.realityforge.eu",

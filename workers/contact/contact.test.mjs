@@ -1,4 +1,4 @@
-import test from "node:test";
+import test, { beforeEach, afterEach, mock } from "node:test";
 import assert from "node:assert/strict";
 import worker from "./index.mjs";
 
@@ -8,6 +8,13 @@ const payload = {
   phase: "Ideenphase / Vorgründung", message: "Testanfrage mit Umlauten: äöü.\nZweite Zeile.",
   website: "", language: "de",
 };
+
+beforeEach(() => {
+  mock.method(globalThis, "fetch", async () => Response.json({
+    Status: 0, Answer: [{ type: 15, data: "10 mx.example.com." }],
+  }));
+});
+afterEach(() => mock.restoreAll());
 
 function request(body = payload, overrides = {}) {
   return new Request("https://contact.example/", {
@@ -101,4 +108,42 @@ test("unsupported methods and paths never send mail", async () => {
   assert.equal((await worker.fetch(request(null, { method: "GET", body: undefined }), env)).status, 405);
   assert.equal((await worker.fetch(new Request("https://contact.example/other"), env)).status, 404);
   assert.equal(env.sent.length, 0);
+});
+
+test("invalid email formats never reach DNS or the email provider", async () => {
+  for (const email of ["a..b@example.com", "a@-example.com", "a@localhost", "a@1.2.3.4"]) {
+    const env = bindings();
+    const response = await worker.fetch(request({ ...payload, email }), env);
+    assert.equal(response.status, 400);
+    assert.equal((await response.json()).code, "email_format");
+    assert.equal(env.sent.length, 0);
+  }
+  assert.equal(globalThis.fetch.mock.callCount(), 0);
+});
+
+test("nonexistent and null-MX domains never send email", async () => {
+  for (const dns of [{ Status: 3 }, { Status: 0, Answer: [{ type: 15, data: "0 ." }] }]) {
+    globalThis.fetch.mock.mockImplementation(async () => Response.json(dns));
+    const env = bindings();
+    const response = await worker.fetch(request(), env);
+    assert.equal(response.status, 400);
+    assert.equal((await response.json()).code, "email_domain");
+    assert.equal(env.sent.length, 0);
+  }
+});
+
+test("temporary DNS failure gives a retryable error, not invalid-email or success", async () => {
+  globalThis.fetch.mock.mockImplementation(async () => Response.json({ Status: 2 }));
+  const env = bindings();
+  const response = await worker.fetch(request(), env);
+  assert.equal(response.status, 503);
+  assert.equal((await response.json()).code, "email_check_unavailable");
+  assert.equal(env.sent.length, 0);
+});
+
+test("honeypot and rate-limited requests do not perform DNS lookups", async () => {
+  await worker.fetch(request({ ...payload, website: "spam" }), bindings());
+  await worker.fetch(request(), bindings({ limited: true }));
+  await worker.fetch(request(), bindings({ globallyLimited: true }));
+  assert.equal(globalThis.fetch.mock.callCount(), 0);
 });

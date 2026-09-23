@@ -105,3 +105,24 @@ test("existing English page receives English feedback", async () => {
 test("shared script still supports business card pages without forms", () => {
   assert.doesNotThrow(() => setup({ hasForm: false }));
 });
+
+test("email validation errors explain the problem and preserve all inputs in both languages", async () => {
+  for (const language of ["de", "en"]) {
+    for (const code of ["email_format", "email_domain", "email_check_unavailable"]) {
+      const ui = setup({ language, fetch: async () => ({
+        ok: false, status: code === "email_check_unavailable" ? 503 : 400,
+        json: async () => ({ ok: false, code }),
+      }) });
+      const before = { ...ui.values };
+      await ui.submit();
+      assert.deepEqual(ui.values, before);
+      assert.equal(ui.form.resetCalled, undefined);
+      assert.equal(ui.status.dataset.state, "error");
+      assert.equal(ui.button.disabled, false);
+      assert.match(ui.status.textContent, /Format|format|Domain|domain/);
+      if (code === "email_check_unavailable") {
+        assert.match(ui.status.textContent, /nichts versendet|Nothing has been sent/);
+      }
+    }
+  }
+});

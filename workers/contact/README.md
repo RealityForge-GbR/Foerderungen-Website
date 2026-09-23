@@ -26,6 +26,15 @@ senden JSON per HTTPS an einen separaten Cloudflare Worker:
   CORS ist kein Bot-Schutz, weil Nicht-Browser-Clients den Origin-Header nachbauen können.
 - Fester Empfänger und eingeschränkte E-Mail-Bindung, keine automatischen Antworten
   an frei wählbare Adressen, Plain-Text-Nachricht und serverseitige Längen-/Formatprüfung.
+- E-Mail-Prüfung vor dem Versand: übliches unquoted Mailbox-Format (keine SMTPUTF8-
+  Localparts), Längen und Domainlabels; internationale Domains werden für Reply-To
+  in ASCII/Punycode normalisiert. Cloudflare DNS-over-HTTPS erhält nur die Domain.
+  MX wird zuerst geprüft; ohne MX sind A/AAAA als implizite Mailroute zulässig.
+  NXDOMAIN, Null-MX und Domains ohne Mailroute werden abgewiesen. DNS-Ausfälle und
+  Zeitüberschreitungen (maximal 4 Sekunden) erzeugen eine gesonderte, wiederholbare
+  Fehlermeldung, ohne die Anfrage zu versenden oder Eingaben zu löschen.
+  Diese Prüfung bestätigt weder die Existenz noch den Besitz eines konkreten
+  Postfachs. Es gibt keine SMTP-Postfachabfrage und keine Bestätigungs-Mail.
 - Verstecktes Honeypot-Feld; höchstens 3 Versuche pro IP und Minute sowie
   30 validierte Anfragen pro Minute **je Cloudflare-Standort**. Cloudflares
   Rate-Limiter ist eventual-consistent, kein globales hartes Kontingent.
@@ -41,7 +50,7 @@ senden JSON per HTTPS an einen separaten Cloudflare Worker:
 Vom Repository-Root, mit Node.js und einer autorisierten Wrangler-Anmeldung:
 
 ```sh
-node --test workers/contact/contact.test.mjs workers/contact/frontend.test.mjs
+node --test workers/contact/contact.test.mjs workers/contact/email-validation.test.mjs workers/contact/frontend.test.mjs
 node --check script.js
 git diff --check
 npx --yes wrangler@4.136.3 deploy --config workers/contact/wrangler.jsonc --dry-run
@@ -49,6 +58,20 @@ npx --yes wrangler@4.136.3 deploy --config workers/contact/wrangler.jsonc
 ```
 
 Die Tests verwenden gemockte Cloudflare-Bindungen und versenden keine E-Mails.
+Auch die DNS-Antworten sind in diesen Tests gemockt. Neue Netzwerklogik zusätzlich
+in der echten Workers-Laufzeit prüfen, bevor sie produktiv geschaltet wird:
+
+```sh
+npx --yes wrangler@4.136.3 dev --remote --config workers/contact/wrangler.jsonc --port 8787
+```
+
+Diese isolierte Vorschau ersetzt den produktiven Worker nicht. Test-POSTs an
+`http://127.0.0.1:8787/` brauchen den produktiven Origin-Header und den gleichen
+JSON-Body wie das Formular. `test@form-check.invalid` und `test@example.com`
+sollen `400 / email_domain` liefern, ohne eine Nachricht zu verschicken.
+Die Vorschau nutzt echte E-Mail-Bindungen: erfolgreiche Tests ausschließlich an
+das eigene, fest konfigurierte Postfach und als technische Tests kennzeichnen.
+
 Ein echter Zustelltest erfolgt über das produktive Formular mit klar als Test
 gekennzeichneten Angaben. Erfolg im Browser und Eingang im Postfach prüfen.
 

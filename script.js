@@ -71,6 +71,9 @@ if (form) {
     sending: "Sending …",
     success: "Your enquiry has been submitted. We will get back to you by email.",
     invalid: "Please check your entries. Name, a valid email address and a message are required.",
+    emailFormat: "Please check the format of your email address, for example name@company.com. Your entries have been kept.",
+    emailDomain: "The domain after @ does not exist or has no email routing configured. Please check your email address for typos. Your entries have been kept.",
+    emailCheckUnavailable: "The email domain could not be checked right now. Nothing has been sent. Please try again shortly; your entries have been kept.",
     limited: "Too many attempts. Please wait a minute before trying again. Your entries have been kept.",
     error: "Sending could not be confirmed. Your entries have been kept. Please try again later or email us directly at realityforgeeu@gmail.com.",
     required: "Please fill in this field.",
@@ -78,6 +81,9 @@ if (form) {
     sending: "Wird gesendet …",
     success: "Eure Anfrage wurde übermittelt. Wir melden uns per E-Mail bei euch.",
     invalid: "Bitte prüft eure Angaben. Name, eine gültige E-Mail-Adresse und eine Nachricht sind erforderlich.",
+    emailFormat: "Bitte prüft das Format eurer E-Mail-Adresse, zum Beispiel name@firma.de. Eure Eingaben bleiben erhalten.",
+    emailDomain: "Die Domain nach dem @ existiert nicht oder ist nicht für den E-Mail-Empfang eingerichtet. Bitte prüft eure E-Mail-Adresse auf Tippfehler. Eure Eingaben bleiben erhalten.",
+    emailCheckUnavailable: "Die E-Mail-Domain konnte gerade nicht geprüft werden. Es wurde nichts versendet. Bitte versucht es gleich noch einmal; eure Eingaben bleiben erhalten.",
     limited: "Zu viele Versuche. Bitte wartet eine Minute und versucht es erneut. Eure Eingaben bleiben erhalten.",
     error: "Der Versand konnte nicht bestätigt werden. Eure Eingaben bleiben erhalten. Bitte versucht es später erneut oder schreibt direkt an realityforgeeu@gmail.com.",
     required: "Bitte füllt dieses Feld aus.",
@@ -121,7 +127,10 @@ if (form) {
       });
       const result = await response.json();
       if (!response.ok || result.ok !== true) {
-        status.textContent = response.status === 429 ? copy.limited
+        status.textContent = result.code === "email_format" ? copy.emailFormat
+          : result.code === "email_domain" ? copy.emailDomain
+          : result.code === "email_check_unavailable" ? copy.emailCheckUnavailable
+          : response.status === 429 ? copy.limited
           : response.status === 400 || response.status === 413 ? copy.invalid : copy.error;
         status.dataset.state = "error";
       } else {
