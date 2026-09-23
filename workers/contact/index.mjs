@@ -1,12 +1,13 @@
 import { parseEmail, checkMailDomain } from "./email-validation.mjs";
+import { verifyConfirmationToken, sendConfirmation } from "./confirmation.mjs";
 
 const ALLOWED_ORIGIN = "https://foerderungen.realityforge.eu";
 const RECIPIENT = "realityforgeeu@gmail.com";
 const SENDER = "foerdercheck@kontakt.realityforge.eu";
 const MAX_BODY_BYTES = 24000;
 
-function reply(status, code, cors = true) {
-  return new Response(JSON.stringify({ ok: status === 200, code }), {
+function reply(status, code, cors = true, details = {}) {
+  return new Response(JSON.stringify({ ok: status === 200, code, ...details }), {
     status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
@@ -116,7 +117,14 @@ export default {
       if (mailDomain === "invalid") return reply(400, "email_domain");
       if (mailDomain === "unavailable") return reply(503, "email_check_unavailable");
 
-      // Fixed envelope, plain text only. Visitors can never choose a recipient.
+      // Old cached pages can still submit internally, but can never trigger an
+      // external receipt without a server-validated, single-use Turnstile token.
+      const wantsConfirmation = Object.hasOwn(data, "turnstileToken");
+      if (wantsConfirmation && !await verifyConfirmationToken(data.turnstileToken, env.TURNSTILE_SECRET_KEY, ip)) {
+        return reply(400, "verification");
+      }
+
+      // The enquiry itself always goes to the fixed internal inbox.
       await env.EMAIL.send({
         from: { email: SENDER, name: "RealityForge Fördercheck" },
         to: RECIPIENT,
@@ -135,7 +143,10 @@ export default {
           message,
         ].join("\n"),
       });
-      return reply(200, "received");
+      const confirmation = wantsConfirmation
+        ? await sendConfirmation(env, mailbox.address, data.language)
+        : "unavailable";
+      return reply(200, "received", true, { confirmation });
     } catch {
       // Do not log form contents, IP addresses or provider errors containing PII.
       return reply(503, "unavailable");

@@ -44,7 +44,8 @@
       })();
     </script>
     <link rel="stylesheet" href="/styles.css?v=contact-20260923">
-    <script src="/script.js?v=contact-email-validation-20260923" defer></script>
+    <script src="/script.js?v=contact-confirmation-20260923" defer></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -490,8 +491,9 @@
           <div class="form-honeypot" aria-hidden="true" inert>
             <label>Website (leave blank)<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
           </div>
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAAFBBonMTab_lwZoF" data-action="contact" data-appearance="interaction-only" data-size="compact" data-language="en"></div>
           <button class="button button-primary button-submit" type="submit" disabled><span class="submit-label">Request a funding check</span> <span aria-hidden="true">→</span></button>
-          <p class="form-note" id="contact-privacy">Your details are sent to us by email via Cloudflare and used to handle your enquiry. <a href="https://realityforge.eu/privacy-policy/">Privacy policy</a></p>
+          <p class="form-note" id="contact-privacy">Your details are sent to us by email via Cloudflare and used to handle your enquiry. You will receive an automatic acknowledgement. Cloudflare Turnstile protects the form against abuse. <a href="https://realityforge.eu/privacy-policy/">Privacy policy</a></p>
           <noscript><p class="form-note">The form requires JavaScript. Alternatively, email <a href="mailto:realityforgeeu@gmail.com">realityforgeeu@gmail.com</a>.</p></noscript>
           <p class="form-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p>
         </form>

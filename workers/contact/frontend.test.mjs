@@ -4,19 +4,20 @@ import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 
 const script = await readFile(new URL("../../script.js", import.meta.url), "utf8");
-function setup({ language = "de", fetch, hasForm = true, valid = true } = {}) {
-  const values = { name: "Test", email: "test@example.com", startup: "", phase: "", message: "Testnachricht", website: "" };
+function setup({ language = "de", fetch, hasForm = true, valid = true, hasVerification = false, token = "test-token" } = {}) {
+  const values = { name: "Test", email: "test@example.com", startup: "", phase: "", message: "Testnachricht", website: "", "cf-turnstile-response": token };
   const listeners = {};
   const status = { textContent: "", dataset: {}, focus() { this.focused = true; } };
   const label = { textContent: "Absenden" };
   const button = { disabled: true, querySelector() { return label; } };
+  const verification = { resets: 0 };
   const required = ["name", "email", "message"].map(key => ({
     get value() { return values[key]; }, setCustomValidity(text) { this.error = text; }, addEventListener() {},
   }));
   const form = {
     action: "https://realityforge-foerderungen-contact.realityforgeeu.workers.dev/",
     getAttribute(name) { return name === "action" ? this.action : null; },
-    querySelector(selector) { return selector === ".form-status" ? status : button; },
+    querySelector(selector) { return selector === ".form-status" ? status : selector === ".cf-turnstile" ? (hasVerification ? verification : null) : button; },
     querySelectorAll() { return required; },
     reportValidity() { return valid && required.every(input => !input.error); },
     addEventListener(name, listener) { listeners[name] = listener; },
@@ -30,12 +31,12 @@ function setup({ language = "de", fetch, hasForm = true, valid = true } = {}) {
       querySelector(selector) { return selector === ".contact-form" && hasForm ? form : null; },
       querySelectorAll() { return []; },
     },
-    window: { matchMedia() { return { addEventListener() {} }; }, addEventListener() {}, location: { hash: "" } },
+    window: { matchMedia() { return { addEventListener() {} }; }, addEventListener() {}, location: { hash: "" }, turnstile: { reset() { verification.resets++; } } },
     FormData: class { get(key) { return values[key]; } },
     AbortController, setTimeout, clearTimeout,
     fetch: fetch || (async () => ({ ok: true, status: 200, json: async () => ({ ok: true }) })),
   });
-  return { form, status, label, button, values, submit: () => listeners.submit({ preventDefault() {} }) };
+  return { form, status, label, button, values, verification, submit: () => listeners.submit({ preventDefault() {} }) };
 }
 
 test("successful submission resets form, restores button, announces status", async () => {
@@ -125,4 +126,35 @@ test("email validation errors explain the problem and preserve all inputs in bot
       }
     }
   }
+});
+
+test("receipt status is shown only when accepted, and tokens reset after submission", async () => {
+  for (const confirmation of ["sent", "unavailable"]) {
+    const ui = setup({ hasVerification: true, fetch: async (url, options) => {
+      assert.equal(JSON.parse(options.body).turnstileToken, "test-token");
+      return { ok: true, status: 200, json: async () => ({ ok: true, confirmation }) };
+    } });
+    await ui.submit();
+    assert.equal(ui.status.dataset.state, "success");
+    assert.equal(ui.verification.resets, 1);
+    assert.equal(ui.status.textContent.includes("Eingangsbestätigung"), confirmation === "sent");
+  }
+});
+
+test("pending or blocked bot check preserves inputs without sending", async () => {
+  const ui = setup({ hasVerification: true, token: "", fetch: async () => assert.fail("must not submit") });
+  await ui.submit();
+  assert.match(ui.status.textContent, /Sicherheitsprüfung/);
+  assert.equal(ui.form.resetCalled, undefined);
+  assert.equal(ui.button.disabled, false);
+});
+
+test("failed server verification preserves inputs and renews the single-use token", async () => {
+  const ui = setup({ hasVerification: true, fetch: async () => ({
+    ok: false, status: 400, json: async () => ({ ok: false, code: "verification" }),
+  }) });
+  await ui.submit();
+  assert.match(ui.status.textContent, /Sicherheitsprüfung/);
+  assert.equal(ui.form.resetCalled, undefined);
+  assert.equal(ui.verification.resets, 1);
 });

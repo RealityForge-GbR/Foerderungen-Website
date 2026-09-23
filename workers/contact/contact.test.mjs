@@ -26,9 +26,17 @@ function request(body = payload, overrides = {}) {
 
 function bindings(options = {}) {
   const sent = [];
+  const confirmations = [];
   return {
-    sent,
+    sent, confirmations,
     EMAIL: { async send(mail) { if (options.fail) throw new Error("Provider unavailable"); sent.push(mail); } },
+    CONFIRMATION_EMAIL: { async send(mail) {
+      assert.equal(sent.length, 1, "internal delivery must succeed first");
+      if (options.confirmationFail) throw new Error("Receipt unavailable");
+      confirmations.push(mail);
+    } },
+    CONFIRMATION_RATE_LIMITER: { async limit() { return { success: !options.recipientLimited }; } },
+    TURNSTILE_SECRET_KEY: "test-secret-not-a-real-key",
     CONTACT_RATE_LIMITER: { async limit() { return { success: !options.limited }; } },
     CONTACT_GLOBAL_LIMITER: { async limit() { return { success: !options.globallyLimited }; } },
   };
@@ -45,6 +53,7 @@ test("sends once to the fixed inbox, sets reply-to, preserves text and returns C
   assert.equal(env.sent[0].replyTo, payload.email);
   assert.ok(env.sent[0].text.includes(payload.message));
   assert.equal(env.sent[0].html, undefined);
+  assert.equal(env.confirmations.length, 0, "cached forms without a token cannot send receipts");
 });
 
 test("preflight is allowed only for the production origin", async () => {
@@ -146,4 +155,69 @@ test("honeypot and rate-limited requests do not perform DNS lookups", async () =
   await worker.fetch(request(), bindings({ limited: true }));
   await worker.fetch(request(), bindings({ globallyLimited: true }));
   assert.equal(globalThis.fetch.mock.callCount(), 0);
+});
+
+function mockVerification(result = { success: true, hostname: "foerderungen.realityforge.eu", action: "contact" }) {
+  globalThis.fetch.mock.mockImplementation(async (url) => Response.json(
+    String(url).includes("/siteverify") ? result : { Status: 0, Answer: [{ type: 15, data: "10 mx.example.com." }] },
+  ));
+}
+
+test("verified submission sends a fixed receipt only to the validated email after internal delivery", async () => {
+  mockVerification();
+  const env = bindings();
+  const response = await worker.fetch(request({ ...payload, turnstileToken: "valid-token", to: "attacker@example.org" }), env);
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).confirmation, "sent");
+  assert.equal(env.confirmations.length, 1);
+  const receipt = env.confirmations[0];
+  assert.equal(receipt.to, payload.email);
+  assert.equal(receipt.replyTo, "realityforgeeu@gmail.com");
+  assert.match(receipt.text, /innerhalb von 48 Stunden/);
+  for (const value of [payload.name, payload.message, payload.startup, "attacker@example.org"]) {
+    assert.ok(!receipt.text.includes(value), "no user-controlled content in receipt");
+  }
+});
+
+test("invalid, missing, expired or wrong-site tokens cannot trigger a receipt", async () => {
+  for (const result of [
+    { success: false, "error-codes": ["timeout-or-duplicate"] },
+    { success: true, hostname: "attacker.example", action: "contact" },
+    { success: true, hostname: "foerderungen.realityforge.eu", action: "other" },
+    { success: "true", hostname: "foerderungen.realityforge.eu", action: "contact" },
+  ]) {
+    mockVerification(result);
+    const env = bindings();
+    const response = await worker.fetch(request({ ...payload, turnstileToken: "invalid-token" }), env);
+    assert.equal(response.status, 400);
+    assert.equal((await response.json()).code, "verification");
+    assert.equal(env.sent.length + env.confirmations.length, 0);
+  }
+  mockVerification();
+  for (const token of ["", null, 42, "x".repeat(2049)]) {
+    const env = bindings();
+    const response = await worker.fetch(request({ ...payload, turnstileToken: token }), env);
+    assert.equal(response.status, 400);
+    assert.equal(env.sent.length + env.confirmations.length, 0);
+  }
+});
+
+test("internal failure never sends a receipt", async () => {
+  mockVerification();
+  const env = bindings({ fail: true });
+  const response = await worker.fetch(request({ ...payload, turnstileToken: "valid-token" }), env);
+  assert.equal(response.status, 503);
+  assert.equal(env.confirmations.length, 0);
+});
+
+test("receipt failure or recipient limit does not turn a delivered enquiry into an error", async () => {
+  mockVerification();
+  for (const options of [{ confirmationFail: true }, { recipientLimited: true }]) {
+    const env = bindings(options);
+    const response = await worker.fetch(request({ ...payload, turnstileToken: "valid-token" }), env);
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).confirmation, "unavailable");
+    assert.equal(env.sent.length, 1);
+    assert.equal(env.confirmations.length, 0);
+  }
 });

@@ -44,7 +44,8 @@
       })();
     </script>
     <link rel="stylesheet" href="/styles.css?v=contact-20260923">
-    <script src="/script.js?v=contact-email-validation-20260923" defer></script>
+    <script src="/script.js?v=contact-confirmation-20260923" defer></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Zum Inhalt springen</a>
@@ -511,8 +512,9 @@
           <div class="form-honeypot" aria-hidden="true" inert>
             <label>Website (bitte leer lassen)<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
           </div>
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAAFBBonMTab_lwZoF" data-action="contact" data-appearance="interaction-only" data-size="compact" data-language="de"></div>
           <button class="button button-primary button-submit" type="submit" disabled><span class="submit-label">Fördercheck anfragen</span> <span aria-hidden="true">→</span></button>
-          <p class="form-note" id="contact-privacy">Eure Angaben werden über Cloudflare per E-Mail an uns übermittelt und zur Bearbeitung eurer Anfrage verwendet. <a href="https://realityforge.eu/privacy-policy/">Datenschutz</a></p>
+          <p class="form-note" id="contact-privacy">Eure Angaben werden über Cloudflare per E-Mail an uns übermittelt und zur Bearbeitung eurer Anfrage verwendet. Ihr erhaltet eine automatische Eingangsbestätigung. Cloudflare Turnstile schützt das Formular vor Missbrauch. <a href="https://realityforge.eu/privacy-policy/">Datenschutz</a></p>
           <noscript><p class="form-note">Für das Formular ist JavaScript erforderlich. Schreibt uns alternativ an <a href="mailto:realityforgeeu@gmail.com">realityforgeeu@gmail.com</a>.</p></noscript>
           <p class="form-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p>
         </form>

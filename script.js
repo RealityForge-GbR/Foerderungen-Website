@@ -65,11 +65,14 @@ if (form) {
   const submitLabel = submitButton.querySelector(".submit-label") || submitButton;
   const idleLabel = submitLabel.textContent;
   const status = form.querySelector(".form-status");
+  const verification = form.querySelector(".cf-turnstile");
   // Also tolerate an older cached HTML page loading the updated shared script.
   const endpoint = form.getAttribute("action") || "https://realityforge-foerderungen-contact.realityforgeeu.workers.dev/";
   const copy = isEnglish ? {
     sending: "Sending …",
     success: "Your enquiry has been submitted. We will get back to you by email.",
+    confirmed: "Your enquiry has been submitted and a confirmation email has been sent. We usually get back to you within 48 hours.",
+    verification: "Please wait for the security check and complete it if prompted. If it cannot load, please email us at realityforgeeu@gmail.com. Your entries have been kept.",
     invalid: "Please check your entries. Name, a valid email address and a message are required.",
     emailFormat: "Please check the format of your email address, for example name@company.com. Your entries have been kept.",
     emailDomain: "The domain after @ does not exist or has no email routing configured. Please check your email address for typos. Your entries have been kept.",
@@ -80,6 +83,8 @@ if (form) {
   } : {
     sending: "Wird gesendet …",
     success: "Eure Anfrage wurde übermittelt. Wir melden uns per E-Mail bei euch.",
+    confirmed: "Eure Anfrage wurde übermittelt und eine Eingangsbestätigung per E-Mail versendet. Wir melden uns in der Regel innerhalb von 48 Stunden bei euch.",
+    verification: "Bitte wartet die Sicherheitsprüfung ab und bestätigt sie, falls ihr dazu aufgefordert werdet. Falls sie nicht lädt, schreibt uns an realityforgeeu@gmail.com. Eure Eingaben bleiben erhalten.",
     invalid: "Bitte prüft eure Angaben. Name, eine gültige E-Mail-Adresse und eine Nachricht sind erforderlich.",
     emailFormat: "Bitte prüft das Format eurer E-Mail-Adresse, zum Beispiel name@firma.de. Eure Eingaben bleiben erhalten.",
     emailDomain: "Die Domain nach dem @ existiert nicht oder ist nicht für den E-Mail-Empfang eingerichtet. Bitte prüft eure E-Mail-Adresse auf Tippfehler. Eure Eingaben bleiben erhalten.",
@@ -104,6 +109,15 @@ if (form) {
 
     const data = new FormData(form);
     const payload = { language: isEnglish ? "en" : "de" };
+    if (verification) {
+      payload.turnstileToken = String(data.get("cf-turnstile-response") || "");
+      if (!payload.turnstileToken) {
+        status.textContent = copy.verification;
+        status.dataset.state = "error";
+        status.focus({ preventScroll: true });
+        return;
+      }
+    }
     ["name", "email", "startup", "phase", "message", "website"].forEach((key) => {
       payload[key] = String(data.get(key) || "").trim();
     });
@@ -130,12 +144,13 @@ if (form) {
         status.textContent = result.code === "email_format" ? copy.emailFormat
           : result.code === "email_domain" ? copy.emailDomain
           : result.code === "email_check_unavailable" ? copy.emailCheckUnavailable
+          : result.code === "verification" ? copy.verification
           : response.status === 429 ? copy.limited
           : response.status === 400 || response.status === 413 ? copy.invalid : copy.error;
         status.dataset.state = "error";
       } else {
         form.reset();
-        status.textContent = copy.success;
+        status.textContent = result.confirmation === "sent" ? copy.confirmed : copy.success;
         status.dataset.state = "success";
       }
     } catch {
@@ -143,6 +158,10 @@ if (form) {
       status.dataset.state = "error";
     } finally {
       clearTimeout(timeout);
+      // Tokens are single-use, including when the backend rejects a submission.
+      if (verification && window.turnstile) {
+        try { window.turnstile.reset(verification); } catch { /* Allow a later page reload. */ }
+      }
       sending = false;
       form.removeAttribute("aria-busy");
       submitButton.disabled = false;

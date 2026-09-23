@@ -9,6 +9,9 @@
     "name": "EMAIL",
     "destination_address": "realityforgeeu@gmail.com",
     "allowed_sender_addresses": ["foerdercheck@kontakt.realityforge.eu"]
+  }, {
+    "name": "CONFIRMATION_EMAIL",
+    "allowed_sender_addresses": ["foerdercheck@kontakt.realityforge.eu"]
   }],
   "ratelimits": [
     {
@@ -20,6 +23,11 @@
       "name": "CONTACT_GLOBAL_LIMITER",
       "namespace_id": "2026092302",
       "simple": { "limit": 30, "period": 60 }
+    },
+    {
+      "name": "CONFIRMATION_RATE_LIMITER",
+      "namespace_id": "2026092303",
+      "simple": { "limit": 1, "period": 60 }
     }
   ],
   "observability": { "enabled": false }
